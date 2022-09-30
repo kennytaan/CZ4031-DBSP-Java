@@ -22,10 +22,10 @@ public class BTreeNode {
     }
 
     public String getContent() {
-        String node = "Node reference: " + super.toString() + "\n";
+//        String node = "Node reference: " + super.() + "\n";
         String keysStr = "Keys: " + Arrays.toString(this.keys) + "\n";
         String ptrStr = "Pointers: " + Arrays.toString(this.pointers) + "\n";
-        return node + keysStr + ptrStr + "\n";
+        return keysStr + ptrStr + "\n";
     }
 
     public int[] getKeys() {
@@ -203,5 +203,51 @@ public class BTreeNode {
                 break;
             }
         }
+    }
+
+    public int[] search (int min, int max) {return this.search(min, max, true);}
+
+    private int[] search(int min, int max, boolean printNodes){
+        int count=0;
+        if (printNodes){
+            System.out.println("Accessing nodes:");
+        }
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        BTreeNode curNode;
+
+        int ptr, i;
+        //get the min leaf node
+        while(curNode.height>0){
+            if(printNodes){
+                count++;
+                System.out.printf(curNode.getContent()+"\n");
+            }
+            for(i=0; i< curNode.size;i++){
+                if(min < curNode.keys[i]){
+                    ptr = i;
+                    break;
+                }
+            }
+            if (i== curNode.size) ptr = curNode.size;
+            curNode = (BTreeNode) curNode.pointers[ptr];
+        }
+
+        while(curNode!=null){ // scan leaf nodes
+            if(printNodes){
+                count++;
+                System.out.printf(curNode.getContent());
+            }
+            for(int i=0;i< curNode.size;i++){
+                if(curNode.keys[i] >= min && curNode.keys[i] <= max) { // if within range add to list
+                    result.add(curNode.pointers[i]);
+                }
+                else if(curNode.keys[i] > max){ //if max is reached
+                    System.out.println("Number of Nodes accessed: "+ count);
+                    return result.stream().mapToInt(i -> i).toArray();
+                }
+            }
+            curNode = (BTreeNode) curNode[MAX_KEYS]; // go to next node
+        }
+
     }
 }
