@@ -126,14 +126,14 @@ public class BTreeNode {
             this.deleteLeafKey(this.keys[MIN_KEYS]);
             newNodeSize++;
         }
-        newLeaf.size = newNodeSize;
+        newLeaf.size = newNodeSize; //right node
 
         //insert key into corr node
         if (key < newLeaf.keys[0]){
-            newLeaf.insertKey(key, address);
+            this.insertKey(key, address);
         }
         else{
-            this.insertKey(key, address);
+            newLeaf.insertKey(key, address);
         }
         // check this.size == newLeaf.size  or this.size == newLeaf.size+1
         if (this.size < newLeaf.size){
@@ -214,7 +214,7 @@ public class BTreeNode {
 
     public int[] search(int min, int max) {return this.search(min, max, true);}
 
-    private int[] search(int min, int max, boolean printNodes){
+    public int[] search(int min, int max, boolean printNodes){
         int count=0;
         if (printNodes){
             System.out.println("Accessing nodes:");
@@ -251,14 +251,18 @@ public class BTreeNode {
             }
             for(i=0;i< curNode.size;i++){
                 if(curNode.keys[i] >= min && curNode.keys[i] <= max) { // if within range add to list
-                    result.add((Integer) curNode.pointers[i]);
+                    System.out.println(curNode.keys[i]);
+                    result.add((Integer) curNode.keys[i]);
                 }
-                else if(curNode.keys[i] > max){ //if max is reached
+                else if(curNode.keys[i] > max || curNode.keys[i] == -1){ //if max is reached
                     System.out.println("Number of Nodes accessed: "+ count);
                     return result.stream().mapToInt(num->num).toArray();
                 }
             }
             curNode = (BTreeNode) curNode.pointers[MAX_KEYS]; // go to next node
+            if(curNode == null){
+                System.out.println("nothing");
+            }
         }
         return null;
     }

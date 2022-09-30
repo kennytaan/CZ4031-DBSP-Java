@@ -6,9 +6,9 @@ public class testing {
         for (int i=0;i<17;i++){
             tree = tree.insertNode(i,i+100);
         }
-        int[] arr = tree.search(1,12);
+        int[] arr = tree.search(1,12,false);
         for(int i=0;i<arr.length;i++){
-            System.out.println(arr);
+            System.out.println(arr[i]);
         }
     }
 }
