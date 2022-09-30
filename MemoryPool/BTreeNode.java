@@ -36,8 +36,10 @@ public class BTreeNode {
         return this.pointers;
     }
 
+    //insert the key here
     public BTreeNode insertNode(int key, int address){
         if (this.height == 0){
+            System.out.println("here");
             return this.insertLeafNode(key, address);
         }
         // get child
@@ -105,12 +107,14 @@ public class BTreeNode {
         return parent;
     }
 
+
     private static int findMin(BTreeNode node) {
         return node.height == 0 ? node.keys[0] : findMin((BTreeNode) node.pointers[0]);
     }
     public BTreeNode insertLeafNode(int key, int address){
         // if node is not full insert key
         if (this.size < MAX_KEYS){
+            System.out.println("her1");
             this.insertKey(key, address);
             return this;
         }
@@ -156,8 +160,10 @@ public class BTreeNode {
     //only for leaf node
     //insert a key and sort the node
     public void insertKey(int key, Object pointer){
-        for(int i=0;i<this.size;i++){
+        System.out.println("here2");
+        for(int i=0;i<MAX_KEYS;i++){
             if(key > this.keys[i]){
+                System.out.println("here3");
                 for (int j=this.size;j>i;j--){
                     this.keys[j] = this.keys[j-1];
                     this.pointers[j] = this.pointers[j-1];
@@ -165,6 +171,7 @@ public class BTreeNode {
                 this.keys[i] = key;
                 this.pointers[i] = pointer;
                 this.size++;
+                System.out.println(this.keys[i]);
                 return;
             }
         }
@@ -228,7 +235,7 @@ public class BTreeNode {
                 System.out.printf(curNode.getContent()+"\n");
             }
             for(i=0; i< curNode.size;i++){
-                if(min < curNode.keys[i]){
+                if(min <= curNode.keys[i]){
                     ptr = i;
                     break;
                 }
