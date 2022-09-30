@@ -22,7 +22,18 @@ public class Utils {
 	
 	//total no of records
 	public static final int NO_OF_RECORDS = NO_OF_BLOCKS * RECORDSPERBLOCK;
+	/*
+    BLOCKSIZE
+    n+1 pointers (8 Bytes)
+    n integer keys (4 Bytes)
+    BLOCKSIZE = 8n + 8 +4n
+    1 BLOCK can fit in (BLOCKSIZE-8/12) keys
+     */
+	public static final int NUMOFKEYS = ((BLOCKSIZE-8)/12);
 
+	public static final int NUMOFPOINTERS= NUMOFKEYS+1;
+
+	public static final int MINKEYS =  (NUMOFKEYS+1)/2;
 	
 }
 

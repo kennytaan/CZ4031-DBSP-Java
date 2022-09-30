@@ -5,8 +5,13 @@ package MemoryPool;
 import static MemoryPool.Utils.BLOCKSIZE;
 
 public class Block {
+    /*
+
+     */
     private byte[] data;
     private int blockOffset;
+
+    private
 
     public Block(){
         this.data = new byte[BLOCKSIZE];

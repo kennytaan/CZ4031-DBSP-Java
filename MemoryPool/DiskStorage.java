@@ -103,7 +103,6 @@ public class DiskStorage {
     //database size = no of blocks x records per block x record size
     public double getDatabaseSizeInMB(){
 
-
         //Record size in a block = records per block x record size
         int recordSizeInABlock = RECORDSIZE * RECORDSPERBLOCK;
 
