@@ -114,7 +114,6 @@ public class BTreeNode {
     public BTreeNode insertLeafNode(int key, int address){
         // if node is not full insert key
         if (this.size < MAX_KEYS){
-            System.out.println("her1");
             this.insertKey(key, address);
             return this;
         }
@@ -152,8 +151,11 @@ public class BTreeNode {
 
         //return parent node
         BTreeNode parent = new BTreeNode();
+        System.out.println(newLeaf.keys[0]);
         parent.insertKey(newLeaf.keys[0], this, newLeaf);
         parent.height = 1;
+
+        System.out.println(parent.getContent());
         return parent;
     }
 
@@ -181,7 +183,7 @@ public class BTreeNode {
     //insert a key with both child pointers and sort the node
     public void insertKey(int key, Object pointer1, Object pointer2){
         int i;
-        for(i=0;i<this.size;i++){
+        for(i=0;i<MAX_KEYS;i++){
             if(key > this.keys[i]){
                 for (int j=this.size;j>i;j--){
                     this.keys[j] = this.keys[j-1];
@@ -236,6 +238,8 @@ public class BTreeNode {
             }
             for(i=0; i< curNode.size;i++){
                 if(min <= curNode.keys[i]){
+                    System.out.println("here123");
+                    System.out.println(curNode.keys[i]);
                     ptr = i;
                     break;
                 }
@@ -254,6 +258,7 @@ public class BTreeNode {
                 System.out.printf(curNode.getContent());
             }
             for(i=0;i< curNode.size;i++){
+                System.out.println(curNode.keys[i]);
                 if(curNode.keys[i] >= min && curNode.keys[i] <= max) { // if within range add to list
                     result.add((Integer) curNode.pointers[i]);
                 }
