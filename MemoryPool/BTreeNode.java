@@ -15,7 +15,7 @@ public class BTreeNode {
     private int height = 0;
     private static int numOfDeletedMerged = 0;
 
-    public BtreeNode(){
+    public BTreeNode(){
         for (int i=0;i<NUMOFKEYS;i++){
             this.keys[i] = -1;
         }
@@ -47,7 +47,7 @@ public class BTreeNode {
         }
         BTreeNode child = (BTreeNode) this.pointers[childIndex];
         this.pointers[childIndex] = child.insertNode(key, address);
-        // if new parent key is returned
+        // if same parent key is returned
         if (child == this.pointers[childIndex]){
             return this;
         }
@@ -111,7 +111,7 @@ public class BTreeNode {
     public BTreeNode insertLeafNode(int key, int address){
         // if node is not full insert key
         if (this.size < MAX_KEYS){
-            this.insertKey();
+            this.insertKey(key, address);
             return this;
         }
 
@@ -121,7 +121,7 @@ public class BTreeNode {
         for(int i=MIN_KEYS;i<MAX_KEYS; i++){
             newLeaf.keys[newNodeSize] = this.keys[MIN_KEYS];
             newLeaf.pointers[newNodeSize] = this.pointers[MIN_KEYS];
-            this.deleteKey(this.keys[MIN_KEYS]);
+            this.deleteLeafKey(this.keys[MIN_KEYS]);
             newNodeSize++;
         }
         newLeaf.size = newNodeSize;
@@ -136,11 +136,11 @@ public class BTreeNode {
         // check this.size == newLeaf.size  or this.size == newLeaf.size+1
         if (this.size < newLeaf.size){
             this.insertKey(newLeaf.keys[0], newLeaf.pointers[0]);
-            newLeaf.deleteKey(newLeaf.keys[0]);
+            newLeaf.deleteLeafKey(newLeaf.keys[0]);
         }
         else if(this.size> newLeaf.size+1){
             newLeaf.insertKey(this.keys[this.size-1], this.pointers[this.size-1]);
-            this.deleteKey(this.keys[this.size-1]);
+            this.deleteLeafKey(this.keys[this.size-1]);
         }
         // arrange last pointer
         newLeaf.pointers[MAX_KEYS] = this.pointers[MAX_KEYS];
@@ -154,6 +154,7 @@ public class BTreeNode {
     }
 
     //only for leaf node
+    //insert a key and sort the node
     public void insertKey(int key, Object pointer){
         for(int i=0;i<this.size;i++){
             if(key > this.keys[i]){
@@ -170,6 +171,7 @@ public class BTreeNode {
     }
 
     //only for non leaf node
+    //insert a key with both child pointers and sort the node
     public void insertKey(int key, Object pointer1, Object pointer2){
         int i;
         for(i=0;i<this.size;i++){
@@ -188,24 +190,26 @@ public class BTreeNode {
         }
     }
 
-    public int deleteKey(int key){
+    //delete key from a node and sort the node
+    public void deleteLeafKey(int key){
         for (int i =0;i<this.size;i++){
             if(this.keys[i] == key) {
                 this.keys[i] = -1;
                 this.pointers[i] = null;
-                for (int j=i;j<this.size-1;j++){
+                int j;
+                for (j=i;j<this.size-1;j++){
                     this.keys[j] = this.keys[j+1];
-                    this.keys[j+1] = -1;
                     this.pointers[j] = this.pointers[j+1];
-                    this.pointers[j+1] = null;
                 }
+                this.keys[j] = -1;
+                this.pointers[j] = null;
                 this.size--;
                 break;
             }
         }
     }
 
-    public int[] search (int min, int max) {return this.search(min, max, true);}
+    public int[] search(int min, int max) {return this.search(min, max, true);}
 
     private int[] search(int min, int max, boolean printNodes){
         int count=0;
@@ -215,8 +219,9 @@ public class BTreeNode {
         ArrayList<Integer> result = new ArrayList<Integer>();
         BTreeNode curNode;
 
-        int ptr, i;
+        int ptr=-1, i;
         //get the min leaf node
+        curNode = this;
         while(curNode.height>0){
             if(printNodes){
                 count++;
@@ -230,6 +235,10 @@ public class BTreeNode {
             }
             if (i== curNode.size) ptr = curNode.size;
             curNode = (BTreeNode) curNode.pointers[ptr];
+            if (ptr == -1){
+                System.out.println("Not found!");
+                return null;
+            }
         }
 
         while(curNode!=null){ // scan leaf nodes
@@ -237,17 +246,50 @@ public class BTreeNode {
                 count++;
                 System.out.printf(curNode.getContent());
             }
-            for(int i=0;i< curNode.size;i++){
+            for(i=0;i< curNode.size;i++){
                 if(curNode.keys[i] >= min && curNode.keys[i] <= max) { // if within range add to list
-                    result.add(curNode.pointers[i]);
+                    result.add((Integer) curNode.pointers[i]);
                 }
                 else if(curNode.keys[i] > max){ //if max is reached
                     System.out.println("Number of Nodes accessed: "+ count);
-                    return result.stream().mapToInt(i -> i).toArray();
+                    return result.stream().mapToInt(num->num).toArray();
                 }
             }
-            curNode = (BTreeNode) curNode[MAX_KEYS]; // go to next node
+            curNode = (BTreeNode) curNode.pointers[MAX_KEYS]; // go to next node
+        }
+        return null;
+    }
+
+    public BTreeNode removeNode(int key){
+        BTreeNode res = this;
+        int[] address = this.search(key, key, false);
+
+        for (int i=0; i< address.length;i++){
+            res = this.remove(key, new ArrayList<BTreeNode>(), new ArrayList<Integer>());
+        }
+        return res;
+    }
+
+    public BTreeNode remove(int key, ArrayList<BTreeNode> parents, ArrayList<Integer> parentPointer){
+        //if key does not exist return
+        if(this.search(key, key, false).length == 0){
+            System.out.println("does not exists!");
+            return this;
         }
 
+        BTreeNode curNode = this;
+        int i;
+        while(curNode.height !=0){
+            //get the child position in parent
+            for (i=0;i<this.size && key>= this.keys[i];i++){
+                continue;
+            }
+            //remember the parent node and the position of the child node in parent
+            parents.add(curNode);
+            parentPointer.add(i);
+            curNode = (BTreeNode) this.pointers[i];//node with key
+        }
+     return null;
     }
+
 }
