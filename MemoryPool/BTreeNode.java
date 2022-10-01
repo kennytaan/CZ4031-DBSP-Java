@@ -219,7 +219,7 @@ public class BTreeNode {
         if (printNodes){
             System.out.println("Accessing nodes:");
         }
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<Integer>(Arrays.asList(-1));
         BTreeNode curNode;
 
         int ptr=-1, i;
@@ -230,7 +230,7 @@ public class BTreeNode {
                 count++;
                 System.out.printf(curNode.getContent()+"\n");
             }
-            for(i=0; i< curNode.size;i++){
+            for(i=0; i< curNode.size;i++){ // scan the node for child with key
                 if(min <= curNode.keys[i]){
                     ptr = i;
                     break;
@@ -238,10 +238,6 @@ public class BTreeNode {
             }
             if (i== curNode.size) ptr = curNode.size;
             curNode = (BTreeNode) curNode.pointers[ptr];
-            if (ptr == -1){
-                System.out.println("Not found!");
-                return null;
-            }
         }
 
         while(curNode!=null){ // scan leaf nodes
@@ -251,6 +247,7 @@ public class BTreeNode {
             }
             for(i=0;i< curNode.size;i++){
                 if(curNode.keys[i] >= min && curNode.keys[i] <= max) { // if within range add to list
+                    if (result.get(0) == -1) result.remove(0);
                     System.out.println(curNode.keys[i]);
                     result.add((Integer) curNode.keys[i]);
                 }
@@ -264,7 +261,7 @@ public class BTreeNode {
                 System.out.println("nothing");
             }
         }
-        return null;
+        return result.stream().mapToInt(num->num).toArray();
     }
 
     public BTreeNode removeNode(int key){
