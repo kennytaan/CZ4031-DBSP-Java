@@ -9,11 +9,14 @@ public class BTreeNode {
     private static final int MAX_POINTERS = NUMOFPOINTERS;
     private static final int MIN_KEYS = MINKEYS;
     private static final int MIN_NON_LEAF = NUMOFKEYS/2;
+    private static int root = 0;
+    private static int numOfNodes = 0;
     private int[] keys = new int[NUMOFKEYS];
     private Object[] pointers = new Object[NUMOFPOINTERS];
     private int size = 0;
     private int height = 0;
     private static int numOfDeletedMerged = 0;
+
 
     public BTreeNode(){
         for (int i=0;i<NUMOFKEYS;i++){
@@ -103,6 +106,7 @@ public class BTreeNode {
         BTreeNode parent = new BTreeNode();
         parent.insertKey(findMin(childNodes[oldNodePointers]), this, newNonLeaf);
         parent.height = this.height +1;
+        if (this.root< parent.height) this.root = parent.height;
         return parent;
     }
 
@@ -116,17 +120,17 @@ public class BTreeNode {
             this.insertKey(key, address);
             return this;
         }
-
+        // node is full
         BTreeNode newLeaf = new BTreeNode();
         int newNodeSize=0;
         //split the node
         for(int i=MIN_KEYS;i<MAX_KEYS; i++){
             newLeaf.keys[newNodeSize] = this.keys[MIN_KEYS];
             newLeaf.pointers[newNodeSize] = this.pointers[MIN_KEYS];
-            this.deleteLeafKey(this.keys[MIN_KEYS]);
+            this.deleteLeafPointer(this.pointers[MIN_KEYS]);
             newNodeSize++;
         }
-        newLeaf.size = newNodeSize; //right node
+        newLeaf.size = newNodeSize; //new leaf is right node
 
         //insert key into corr node
         if (key < newLeaf.keys[0]){
@@ -138,11 +142,11 @@ public class BTreeNode {
         // check this.size == newLeaf.size  or this.size == newLeaf.size+1
         if (this.size < newLeaf.size){
             this.insertKey(newLeaf.keys[0], newLeaf.pointers[0]);
-            newLeaf.deleteLeafKey(newLeaf.keys[0]);
+            newLeaf.deleteLeafPointer(newLeaf.pointers[0]);
         }
         else if(this.size> newLeaf.size+1){
             newLeaf.insertKey(this.keys[this.size-1], this.pointers[this.size-1]);
-            this.deleteLeafKey(this.keys[this.size-1]);
+            this.deleteLeafPointer(this.pointers[this.size-1]);
         }
         // arrange last pointer
         newLeaf.pointers[MAX_KEYS] = this.pointers[MAX_KEYS];
@@ -152,7 +156,7 @@ public class BTreeNode {
         BTreeNode parent = new BTreeNode();
         parent.insertKey(newLeaf.keys[0], this, newLeaf);
         parent.height = 1;
-
+        if(this.root < parent.height) this.root = parent.height;
         return parent;
     }
 
@@ -194,9 +198,9 @@ public class BTreeNode {
     }
 
     //delete key from a node and sort the node
-    public void deleteLeafKey(int key){
+    public void deleteLeafPointer(Object pointer){
         for (int i =0;i<this.size;i++){
-            if(this.keys[i] == key) {
+            if(this.pointers[i] == pointer) {
                 this.keys[i] = -1;
                 this.pointers[i] = null;
                 int j;
@@ -215,6 +219,7 @@ public class BTreeNode {
     public int[] search(int min, int max) {return this.search(min, max, true);}
 
     public int[] search(int min, int max, boolean printNodes){
+        // count number of access
         int count=0;
         if (printNodes){
             System.out.println("Accessing nodes:");
@@ -227,6 +232,7 @@ public class BTreeNode {
         curNode = this;
         while(curNode.height>0){
             if(printNodes){
+                //increment accesses
                 count++;
                 System.out.printf(curNode.getContent()+"\n");
             }
@@ -248,8 +254,7 @@ public class BTreeNode {
             for(i=0;i< curNode.size;i++){
                 if(curNode.keys[i] >= min && curNode.keys[i] <= max) { // if within range add to list
                     if (result.get(0) == -1) result.remove(0);
-                    System.out.println(curNode.keys[i]);
-                    result.add((Integer) curNode.keys[i]);
+                    result.add((Integer) curNode.pointers[i]);
                 }
                 else if(curNode.keys[i] > max || curNode.keys[i] == -1){ //if max is reached
                     System.out.println("Number of Nodes accessed: "+ count);
@@ -258,13 +263,15 @@ public class BTreeNode {
             }
             curNode = (BTreeNode) curNode.pointers[MAX_KEYS]; // go to next node
             if(curNode == null){
-                System.out.println("nothing");
+                if (result.get(0) == -1) System.out.println("No instance found!");
+                System.out.println("Reached end of database");
             }
         }
         return result.stream().mapToInt(num->num).toArray();
     }
 
     public BTreeNode removeNode(int key){
+        // remove all duplicates
         BTreeNode res = this;
         int[] address = this.search(key, key, false);
 
@@ -275,25 +282,212 @@ public class BTreeNode {
     }
 
     public BTreeNode remove(int key, ArrayList<BTreeNode> parents, ArrayList<Integer> parentPointer){
-        //if key does not exist return
-        if(this.search(key, key, false).length == 0){
-            System.out.println("does not exists!");
-            return this;
-        }
-
         BTreeNode curNode = this;
         int i;
+        // this gives me the leaf node
         while(curNode.height !=0){
-            //get the child position in parent
+            //this gets the child position in parent
             for (i=0;i<this.size && key>= this.keys[i];i++){
                 continue;
             }
             //remember the parent node and the position of the child node in parent
-            parents.add(curNode);
-            parentPointer.add(i);
-            curNode = (BTreeNode) this.pointers[i];//node with key
+            //treat this list as a stack
+
+            parents.add(0, curNode);
+            parentPointer.add(0, i);
+            curNode = (BTreeNode) curNode.pointers[i];//child node with key
         }
-     return null;
+        // find key and delete in leaf node
+        boolean found = false;
+        for (i=0;i<curNode.size;i++){
+            if (curNode.keys[i] == key){
+                curNode.deleteLeafPointer(curNode.pointers[i]);
+                found = true;
+            }
+        }
+        if(!found){
+            System.out.println("Not found!");
+            return this;
+        }
+        if(curNode == this){
+            if(curNode.size == 0){
+                System.out.println("Empty tree!");
+            }
+            return this;
+        }
+        // if the node from deletion has lesser than minimum keys
+        if( curNode.size < MIN_KEYS){
+            BTreeNode parentNode = parents.get(0);
+            int childIndex = parentPointer.get(0);
+
+            // check if left sibling exist
+            if(childIndex-1 >= 0){
+                BTreeNode leftSibling = (BTreeNode) parentNode.pointers[childIndex-1];
+                // check if left sibling has enough keys
+                if(leftSibling.size>MIN_KEYS){
+                    //take keys from sibling
+                    curNode.insertKey(leftSibling.keys[leftSibling.size-1], leftSibling.pointers[leftSibling.size-1]);
+                    leftSibling.deleteLeafPointer(leftSibling.pointers[leftSibling.size-1]);
+                    //update the parent keys
+                    parentNode.keys[childIndex-1] =  curNode.keys[0];
+                    return this;
+                }
+            }
+            // check if right sibling exists
+            if(childIndex+1 < parentNode.size){
+                BTreeNode rightSibling = (BTreeNode) parentNode.pointers[childIndex+1];
+                // check if right sibling has enough keys
+                if(rightSibling.size>MIN_KEYS){
+                    curNode.insertKey(rightSibling.keys[0], rightSibling.pointers[0]);
+                    rightSibling.deleteLeafPointer(rightSibling.pointers[0]);
+                    // update the parents
+                    parentNode.keys[childIndex] = rightSibling.keys[0];
+                    return this;
+                }
+            }
+            // no siblings to get keys
+            // attempt to merge with siblings
+            //check if left sibling exists
+            if(childIndex-1 >= 0){
+                BTreeNode leftSibling = (BTreeNode) parentNode.pointers[childIndex-1];
+                int j;
+                for(i=leftSibling.size,j=0;j< curNode.size;j++,i++){
+                    leftSibling.keys[i] = curNode.keys[j];
+                    leftSibling.pointers[i] = curNode.pointers[j];
+                    leftSibling.size++;
+                }
+                // copy over last pointer
+                leftSibling.pointers[MAX_POINTERS-1] = curNode.pointers[MAX_POINTERS-1];
+                System.out.printf("line 361: ");
+                System.out.println(parents.size());
+                BTreeNode result = removeInternal(curNode.keys[0], parents, parentPointer);
+                if(result == this) return this;
+                else{
+                    return result;
+                }
+            }
+            //merge right sibling
+            if(childIndex+1 < parentNode.size){
+                BTreeNode rightSibling = (BTreeNode) parentNode.pointers[childIndex+1];
+                int j;
+                for(i=curNode.size,j=0;j< rightSibling.size;j++,i++){
+                    curNode.keys[i] = rightSibling.keys[j];
+                    curNode.pointers[i] = rightSibling.pointers[j];
+                    curNode.size++;
+                }
+                // copy over last pointer
+                curNode.pointers[MAX_POINTERS-1] = rightSibling.pointers[MAX_POINTERS-1];
+                BTreeNode result = removeInternal(rightSibling.keys[0], parents, parentPointer);
+                if(result == this) return this;
+                else{
+                    return result;
+                }
+            }
+
+        }
+     return this;
     }
 
+    //after merged, call removeInternal to delete the pointer from parents
+    public BTreeNode removeInternal(int key, ArrayList<BTreeNode> parentList, ArrayList<Integer> pointerList){
+
+        // get the parent node from the makeshift stack
+        BTreeNode parent = parentList.get(0);
+        parentList.remove(0);
+        // get the pointer index in parent node
+        int parentPtr = pointerList.get(0);
+        pointerList.remove(0);
+
+        //if the parent is the root and only 1 key
+        //lets kill the root and take the child
+        if(parent.height == this.root && parent.size == 1){
+            this.root--;
+            return (BTreeNode) parent.pointers[0];
+        }
+
+        //remove the key from parent
+        //shift all keys forward
+        for(int j=parentPtr; j< parent.size-1;j++){
+            parent.keys[j] = parent.keys[j+1];
+            parent.pointers[j+1] = parent.pointers[j+2];
+        }
+        parent.keys[parent.size-1] = -1;
+        parent.pointers[parent.size] = null;
+        parent.size--;
+
+        // parent has enough keys
+        //just return self
+        if(parent.size >= MIN_NON_LEAF){
+            return this;
+        }
+
+        // if code reaches here, there is underflow in parent
+        if(parent.height == this.root){ //if we are root, nothing much you can do here, return parent
+            return parent;
+        }
+
+        BTreeNode greaterParent = parentList.get(0);
+        int parentIndex = pointerList.get(0);
+        // find the position of parent in the greater of parent
+//        for(int i=0;i< greaterParent.size+1;i++){
+//            if(greaterParent.pointers[i] == parent){
+//                parentIndex = i;
+//            }
+//        }
+        //check if left sibling exists
+        if(parentIndex > 0){
+            BTreeNode leftSibling = (BTreeNode) greaterParent.pointers[parentIndex-1];
+            //check if we can take key from leftSibling
+            if(leftSibling.size > MIN_NON_LEAF){
+                parent.insertKey(leftSibling.keys[leftSibling.size-1], leftSibling.pointers[leftSibling.size]);
+                leftSibling.deleteLeafPointer(leftSibling.pointers[leftSibling.size]);
+                //nicely robbed, now we will copy this key over to the greater parent
+                greaterParent.keys[parentIndex] = parent.keys[0];
+                return this;
+            }
+        }
+
+        //check if right sibling exists
+        if (parentIndex +1 < greaterParent.size){
+            BTreeNode rightSibling = (BTreeNode) greaterParent.pointers[parentIndex+1];
+            //check if rightSibling has any keys to take
+            if(rightSibling.size > MIN_NON_LEAF){
+                parent.insertKey(rightSibling.keys[0], rightSibling.pointers[0]);
+                rightSibling.deleteLeafPointer(rightSibling.pointers[0]);
+                //taken nicely, copy this right sibling's key to the greater parent
+                greaterParent.keys[parentIndex+1] = rightSibling.keys[0];
+                return this;
+            }
+        }
+
+        //no siblings to steal keys from
+        //try to merge with left sibling instead
+        if(parentIndex > 0){
+            BTreeNode leftSibling = (BTreeNode) greaterParent.pointers[parentIndex-1];
+            int i,j;
+            // find min key for each pointer node inserted to left sibling
+            for(i=leftSibling.size,j=0;j< parent.size;j++,i++){
+                leftSibling.keys[i] = findMin((BTreeNode) parent.pointers[j]);
+                leftSibling.pointers[i+1] = parent.pointers[j];
+                leftSibling.size++;
+            }
+
+            return removeInternal(greaterParent.keys[parentIndex], parentList, pointerList);
+        }
+
+        //if left sibling does not exist, merge with the right sibling
+        if (parentIndex +1 < greaterParent.size) {
+            BTreeNode rightSibling = (BTreeNode) greaterParent.pointers[parentIndex+1];
+            int i, j;
+            for(i=parent.size,j=0;j< rightSibling.size;j++,i++){
+                parent.keys[i] = findMin((BTreeNode) rightSibling.pointers[j]);
+                parent.pointers[i+1] = rightSibling.pointers[j];
+                parent.size++;
+            }
+            return removeInternal(greaterParent.keys[parentIndex+1], parentList, pointerList);
+        }
+        return this;
+    }
 }
+
+
