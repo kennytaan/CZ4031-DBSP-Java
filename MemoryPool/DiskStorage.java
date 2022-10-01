@@ -8,6 +8,9 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import static MemoryPool.Utils.NO_OF_BLOCKS;
 import static MemoryPool.Utils.BLOCKSIZE;
@@ -43,7 +46,7 @@ public class DiskStorage {
     }
 
     public void insertRecord(Record record) throws IOException{
-        byte[] tConst_b = stringToByteArray(record.getTConst());
+        byte[] tConst_b = charArrToByteArray(record.getTConst());
         byte[] avgRating_b = floatToByteArray(record.getAverageRating());
         byte[] numVotes_b = intToByteArray(record.getNumVotes());
         //concatenate byte array
@@ -81,17 +84,98 @@ public class DiskStorage {
         //System.out.printf("adding to block no. " + currentBlock + "\n");
 
         //inserting into bplus tree
-        int address = this.currentBlock * BLOCKSIZE + offset; //block is inserted x blocksize + offset 
+        int address = this.currentBlock * BLOCKSIZE + offset; //address = block tht is inserted x blocksize + offset 
         bpt = bpt.insertNode(record.getNumVotes(), address);
         
+    }
+
+    /* TO BE ADDED */
+    public Record[] searchForRecord(int min, int max){
+
+        //return the addresses 
+        int[] searchResults = bpt.search(min, max);
+        System.out.println(searchResults);
+        ArrayList<Record> recordsList = new ArrayList<>(); 
+
+        //making hashmap to store the address 
+        HashSet<Integer> testHash = new HashSet<Integer>();
+        int noOfDataBlocksAccessed = 0;
+
+        //looping through the searchresults
+        for(int i=0;i<searchResults.length; i++){
+            
+            //get the address of the key
+            int address = searchResults[i];
+            //System.out.println(address);
+
+            //using the formula of the address to trace back the block where the key is stored in disk
+            int targetBlock = address/ BLOCKSIZE;
+
+            //using the formula to trace back the block offset
+            int targetBlockOffset = address % BLOCKSIZE;
+
+            //if the targetBlock is empty block
+            if (blocks[targetBlock] == null){
+                
+                break;
+            }
+
+            //if successfully added to hashmap, get the hex data of the block byte[]
+            boolean added = testHash.add(targetBlock);
+            if (added){
+                //System.out.println(blocks[targetBlock].getHexData());
+                noOfDataBlocksAccessed+=1;
+                
+            }
+
+            
+            //getting the record data and convert it back to its supposed variable (char[])
+            byte[] recordData = Arrays.copyOfRange(blocks[targetBlock].getData(), targetBlockOffset, targetBlockOffset+BLOCKSIZE);
+        
+
+            //getting the tconst data in byte[] from the first 20bytes and convert to char[]
+            byte[] tConstData = Arrays.copyOfRange(recordData, 0, 20);
+            char[] tConstActual = convertFromByteArrToCharArr(tConstData);
+
+            //getting the rating in bytep[] from the next 4 bytes and convert to float
+            byte[] avgRatingData = Arrays.copyOfRange(recordData, 20, 24);
+            float avgRatingActual = convertFromByteArrToFloat(avgRatingData);
+
+            //getting the num votes in byte[] from the next 4 bytes and convert to int
+            byte[] numVotesData = Arrays.copyOfRange(recordData, 24,28);
+            int numVotesActual = convertFromByteArrToInt(numVotesData);
+
+            //make a new record object w the datas retrieved
+            Record recordToBeAdded = new Record(tConstActual,avgRatingActual,numVotesActual);
+
+            //add this record into the arraylist of search results records
+            recordsList.add(recordToBeAdded);
+            
+        }
+
+        //saving the recordslist into a new record array
+        Record[] recordsResults = new Record[recordsList.size()];
+        //looping thru recordsList to get and add the records into the records array
+        for(int i =0; i<recordsList.size();i++){
+            recordsResults[i] = recordsList.get(i);
+        }
+        //System.out.println(recordsResults);
+        System.out.println("The number of data blocks accessed is " + noOfDataBlocksAccessed + "\n");
+        return recordsResults;
+
     }
 
     
 
     // Functions to help convert to byte[]
-    private static byte[] stringToByteArray(String value){
-        byte[] output = value.getBytes(StandardCharsets.UTF_8);
-        return output;
+    private static byte[] charArrToByteArray(char[] value){
+        byte[] b = new byte[value.length << 1];
+        for (int i = 0; i < value.length; i++) {
+            int bpos = i << 1;
+            b[bpos] = (byte) ((value[i] & 0xFF00) >> 8);
+            b[bpos + 1] = (byte) (value[i] & 0x00FF);
+        }
+        return b;
     }
 
     private static byte[] floatToByteArray(float value) {
@@ -109,6 +193,31 @@ public class DiskStorage {
     }
 
 
+
+    /*TO BE ADDED */
+    //Functions to help convert from byte[] back to char[], int, float
+    private static char[] convertFromByteArrToCharArr(byte[] bytes){
+        Charset charset = Charset.forName("UTF-8");
+        CharBuffer charBuffer = charset.decode(ByteBuffer.wrap(bytes));
+        char[] arr = Arrays.copyOf(charBuffer.array(), charBuffer.limit());
+        char[] result = new char[10];
+        for (int i = 1; i < arr.length; i += 2) {
+            result[i/2] = arr[i];
+        }
+        return result;
+    }
+
+    private static float convertFromByteArrToFloat(byte[] bytes){
+        float result = ByteBuffer.wrap(bytes).getFloat();
+        return result;
+    }
+
+    private static int convertFromByteArrToInt(byte[] bytes){
+        int result = ByteBuffer.wrap(bytes).getInt();
+        return result;
+    }
+
+
     //for experiment 1: calculating the database size in MB
     //database size = no of blocks x records per block x record size
     public double getDatabaseSizeInMB(){
@@ -117,7 +226,7 @@ public class DiskStorage {
         int recordSizeInABlock = RECORDSIZE * RECORDSPERBLOCK;
 
         //Total size of the database = no of blocks x record size in a block
-        int databaseSizeInBytes = (this.getNoOfBlocks() - 1) * recordSizeInABlock;
+        int databaseSizeInBytes = (this.getNoOfBlocks() - 1) * recordSizeInABlock ;
 
         //Convert database size (in bytes) to MB
         double databaseSizeInMB =(double)(databaseSizeInBytes / (1024.0 * 1024.0));

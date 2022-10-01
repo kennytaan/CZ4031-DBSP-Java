@@ -30,6 +30,15 @@ public class Block {
         this.blockOffset = this.blockOffset + record.length;
     }
 
+
+    /*TO BE ADDED */
+    public String getHexData() {
+        StringBuilder sb = new StringBuilder(data.length * 2);
+        for(byte b: data)
+            sb.append(String.format("%02x", b));
+        return "0x" + sb.toString();
+    }
+
     // public void addData(byte[] record){
     //     //to do
     // }

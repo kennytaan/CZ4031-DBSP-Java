@@ -5,18 +5,18 @@ package MemoryPool;
 //record consists of 3 variables: tConst, avgRating, numOfVotes
 public class Record{
 
-	private String tConst;
+	private char[] tConst;
 	private float averageRating;
 	private int numVotes;
 	public Object getTConst;
 
-	public Record(String tConst, float averageRating, int numVotes ){
+	public Record(char[] tConst, float averageRating, int numVotes ){
 		this.tConst = tConst;
 		this.averageRating = averageRating;
 		this.numVotes = numVotes;
 	}
 
-	public String getTConst(){
+	public char[] getTConst(){
 		return tConst;
 	}
 
