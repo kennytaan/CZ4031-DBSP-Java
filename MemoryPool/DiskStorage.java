@@ -20,12 +20,14 @@ public class DiskStorage {
     //store blocks in an array
     // to access certain block --> blocks[blockno]
     private Block[] blocks;
+    BTreeNode bpt;
     private int currentBlock;
 
     //initialize
     public DiskStorage(){
         this.blocks = new Block[NO_OF_BLOCKS];
         this.currentBlock = 0; 
+        this.bpt = new BTreeNode();
     }
 
     public Block getCurrentBlock(){
@@ -34,6 +36,10 @@ public class DiskStorage {
 
     public int getNoOfBlocks(){
         return currentBlock + 1;
+    }
+    
+    public BTreeNode getBPT() {
+        return bpt;
     }
 
     public void insertRecord(Record record) throws IOException{
@@ -74,6 +80,10 @@ public class DiskStorage {
         }
         //System.out.printf("adding to block no. " + currentBlock + "\n");
 
+        //inserting into bplus tree
+        int address = this.currentBlock * BLOCKSIZE + offset; //block is inserted x blocksize + offset 
+        bpt = bpt.insertNode(record.getNumVotes(), address);
+        
     }
 
     

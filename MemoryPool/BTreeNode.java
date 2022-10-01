@@ -27,8 +27,8 @@ public class BTreeNode {
     public String getContent() {
 //        String node = "Node reference: " + super.() + "\n";
         String keysStr = "Keys: " + Arrays.toString(this.keys) + "\n";
-        String ptrStr = "Pointers: " + Arrays.toString(this.pointers) + "\n";
-        return keysStr + ptrStr + "\n";
+        String ptrStr = "Pointers: " + Arrays.toString(this.pointers);
+        return keysStr + ptrStr;
     }
 
     public int[] getKeys() {
@@ -37,6 +37,23 @@ public class BTreeNode {
 
     public Object[] getPointers() {
         return this.pointers;
+    }
+
+    public int getNoOfNodes(){
+        int noOfNodes = 1;
+        if (height == 0){
+            return noOfNodes;
+        }
+        else{
+            for(int i = 0; i <= this.size; i++){
+                noOfNodes = noOfNodes + ((BTreeNode) pointers[i]).getNoOfNodes();
+            }
+            return noOfNodes;
+        }
+    }
+
+    public int getHeight(){
+        return height;
     }
 
     //insert the key here
