@@ -5,6 +5,8 @@ import java.util.ArrayList;
 //import java.util.ArrayList;
 //import java.io.IOException;
 
+import MemoryPool.BTreeNode;
+
 //import java.io.FileWriter;
 //import java.io.BufferedWriter;
 
@@ -19,23 +21,30 @@ import MemoryPool.Record;
 public class Main{
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		
-		DiskStorage disk = readFile("data.tsv"); //reading tsv file
+		DiskStorage diskfor200MB = readFile("data.tsv"); //reading tsv file
+
+		System.out.println("EXPERIMENTS FOR 200MB");
+		System.out.println("==================================================\n");
 
 		//Experiment 1
 		System.out.println("Experiment 1:");
-		System.out.println("The number of blocks: "+ disk.getNoOfBlocks());
-		System.out.println("The size of database (in terms of MB): " + disk.getDatabaseSizeInMB() +"MB");
+		System.out.println("The number of blocks: "+ diskfor200MB.getNoOfBlocks());
+		System.out.println("The size of database (in terms of MB): " + diskfor200MB.getDatabaseSizeInMB() +"MB");
 		System.out.println("\n");
-		System.out.println("==================================================");
-		System.out.println("\n");
+		//System.out.println("\n");
 
 
 		//Experiment 2
-
-
-
+		System.out.println("Experiment 2: ");
+		System.out.println("The parameter n of the B+ tree: " + BTreeNode.MAX_KEYS);
+		System.out.println("The number of nodes of the B+ tree: " + diskfor200MB.getBPT().getNoOfNodes());
+		System.out.println("The height of the B+ tree, i.e the number of levels of the B+ tree: " + (diskfor200MB.getBPT().getHeight()+1));
+		System.out.println("The content of the root node: \n" + diskfor200MB.getBPT().getContent() + "\n");
+		BTreeNode firstChildNodeFor200MB = ((BTreeNode) diskfor200MB.getBPT().getPointers()[0]);
+		System.out.println("The content of the 1st child node: \n" + firstChildNodeFor200MB.getContent());
 
 		//Experiment 3
+
 
 
 
