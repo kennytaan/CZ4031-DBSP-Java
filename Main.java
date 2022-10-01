@@ -40,18 +40,23 @@ public class Main{
 		System.out.println("The number of nodes of the B+ tree: " + diskfor200MB.getBPT().getNoOfNodes());
 		System.out.println("The height of the B+ tree, i.e the number of levels of the B+ tree: " + (diskfor200MB.getBPT().getHeight()+1));
 		System.out.println("The content of the root node: \n" + diskfor200MB.getBPT().getContent() + "\n");
+		//getting the first child node 
 		BTreeNode firstChildNodeFor200MB = ((BTreeNode) diskfor200MB.getBPT().getPointers()[0]);
-		System.out.println("The content of the 1st child node: \n" + firstChildNodeFor200MB.getContent());
+		System.out.println("The content of the 1st child node: \n" + firstChildNodeFor200MB.getContent() + "\n");
 
-		//Experiment 3
-
-
-
-
-
-
+		//Experiment 3 /* TO BE ADDED */
+		System.out.println("Experiment 3: ");
+		Record[] records= diskfor200MB.searchForRecord(500,500);
+		double totalRating = 0;
+		for(Record record: records){
+	 		totalRating += record.getAverageRating();
+		}
+		System.out.println("Average of average rating: " + totalRating/records.length);
 
 		//Experiment 4
+		//System.
+
+
 
 
 
@@ -102,7 +107,7 @@ public class Main{
 				}
 
 				//store the record line as a temp record
-				Record tempRecord = new Record(tConst.toString(), avgRating, numOfVotes);
+				Record tempRecord = new Record(tConst.toCharArray(), avgRating, numOfVotes);
 				tempData.add(tempRecord); //storing the temp record to temp arraylist tempData
 				
 				
@@ -119,5 +124,11 @@ public class Main{
 		}
 		return d;
 	}
+
+	// private static float calcAvgRatingFromSearch(Record[] ){
+
+	// }
+
+	
 
 }
