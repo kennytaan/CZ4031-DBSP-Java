@@ -28,7 +28,7 @@ public class BTreeNode {
 //        String node = "Node reference: " + super.() + "\n";
         String keysStr = "Keys: " + Arrays.toString(this.keys) + "\n";
         String ptrStr = "Pointers: " + Arrays.toString(this.pointers);
-        return keysStr + ptrStr;
+        return keysStr + ptrStr + "\n";
     }
 
     public int[] getKeys() {

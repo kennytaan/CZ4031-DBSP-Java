@@ -30,7 +30,7 @@ public class Record{
 
 	//returning the entire record as a string
 	public String getRecordString(){
-		return "Record{ tConst = " + tConst +
+		return "Record{ tConst = " + new String (tConst) +
 				", averageRating = " + averageRating + 
 				", numVotes = " + numVotes + " }";
 	}

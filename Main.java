@@ -46,22 +46,12 @@ public class Main{
 
 		//Experiment 3 /* TO BE ADDED */
 		System.out.println("Experiment 3: ");
-		Record[] records= diskfor200MB.searchForRecord(500,500);
-		double totalRating = 0;
-		for(Record record: records){
-	 		totalRating += record.getAverageRating();
-		}
-		System.out.println("Average of average rating: " + totalRating/records.length);
+		System.out.println("Average of average rating: " + calcAvgRatingFromSearch(diskfor200MB.searchForRecord(500,500)) + "\n\n");
 
 		//Experiment 4
-		//System.
-
-
-
-
-
-
-		
+		System.out.println("Experiment 4: ");
+		System.out.println("Average of average rating: " + calcAvgRatingFromSearch(diskfor200MB.searchForRecord(30000, 40000)) + "\n\n");
+	
 	}
 
 
@@ -125,9 +115,16 @@ public class Main{
 		return d;
 	}
 
-	// private static float calcAvgRatingFromSearch(Record[] ){
 
-	// }
+	//for experiment 3
+	private static double calcAvgRatingFromSearch(Record[] records){
+		//Record[] records= diskfor200MB.searchForRecord(500,500);
+		double totalRating = 0;
+		for(Record record: records){
+	 		totalRating += record.getAverageRating();
+		}
+		return totalRating/records.length;
+	}
 
 	
 
