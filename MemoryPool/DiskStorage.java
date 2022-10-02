@@ -246,7 +246,23 @@ public class DiskStorage {
 
     //for experiment 1: calculating the database size in MB
     //database size = no of blocks x records per block x record size
-    public double getDatabaseSizeInMB(){
+    public double getActualDatabaseSizeInMB(){
+
+        //Record size in a block = records per block x record size
+        int recordSizeInABlock = RECORDSIZE * RECORDSPERBLOCK;
+
+        //Total size of the database = no of blocks x record size in a block
+        int databaseSizeInBytes = (this.getNoOfBlocks() - 1) * BLOCKSIZE ;
+
+        /*TO BE ADDED HERE */
+        databaseSizeInBytes += this.getCurrentBlock().getOffset();
+
+        //Convert database size (in bytes) to MB
+        double databaseSizeInMB =(double)(databaseSizeInBytes / (1000000));
+
+        return databaseSizeInMB;
+    }
+    public double getEffectiveDatabaseSizeInMB(){
 
         //Record size in a block = records per block x record size
         int recordSizeInABlock = RECORDSIZE * RECORDSPERBLOCK;
@@ -254,7 +270,7 @@ public class DiskStorage {
         //Total size of the database = no of blocks x record size in a block
         int databaseSizeInBytes = (this.getNoOfBlocks() - 1) * recordSizeInABlock ;
 
-        /*TO BE ADDED HERE */ 
+        /*TO BE ADDED HERE */
         databaseSizeInBytes += this.getCurrentBlock().getOffset();
 
         //Convert database size (in bytes) to MB

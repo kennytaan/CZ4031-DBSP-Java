@@ -31,7 +31,7 @@ public class Main{
 		//Experiment 1
 		System.out.println("Experiment 1:");
 		System.out.println("The number of blocks: "+ diskfor200MB.getNoOfBlocks());
-		System.out.println("The size of database (in terms of MB): " + diskfor200MB.getDatabaseSizeInMB() +"MB");
+		System.out.println("The size of database (in terms of MB): " + diskfor200MB.getEffectiveDatabaseSizeInMB() +"MB");
 		System.out.println("\n");
 		//System.out.println("\n");
 
@@ -89,7 +89,7 @@ public class Main{
 				//Experiment 1
 				System.out.println("Experiment 1:");
 				System.out.println("The number of blocks: "+ diskfor500MB.getNoOfBlocks());
-				System.out.println("The size of database (in terms of MB): " + diskfor500MB.getDatabaseSizeInMB() +"MB");
+				System.out.println("The size of database (in terms of MB): " + diskfor500MB.getEffectiveDatabaseSizeInMB() +"MB");
 				System.out.println("\n");
 				//System.out.println("\n");
 

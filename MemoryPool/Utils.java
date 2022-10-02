@@ -7,8 +7,7 @@ public class Utils {
 
 	public static void setBlockSize(){
 		BLOCKSIZE = 500;
-		RECORDSIZE = (10 * 2) + 4 + 4;1
-
+		RECORDSIZE = (10 * 2) + 4 + 4;
 		DISKCAPACITY = 500 * 1000000;
 		RECORDSPERBLOCK = BLOCKSIZE/RECORDSIZE;
 		NO_OF_BLOCKS = DISKCAPACITY/BLOCKSIZE;
