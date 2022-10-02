@@ -27,13 +27,8 @@ public class BTreeNode {
     public String getContent() {
 //        String node = "Node reference: " + super.() + "\n";
         String keysStr = "Keys: " + Arrays.toString(this.keys) + "\n";
-<<<<<<< Updated upstream
-        String ptrStr = "Pointers: " + Arrays.toString(this.pointers);
-        return keysStr + ptrStr + "\n";
-=======
         String ptrStr = "Pointers: " + Arrays.toString(this.pointers) + "\n";
         return keysStr + ptrStr;
->>>>>>> Stashed changes
     }
 
     public int[] getKeys() {
@@ -285,7 +280,7 @@ public class BTreeNode {
             }
             ptr =0;
             for(i=0; i< curNode.size && min >= curNode.keys[i];i++){ // scan the node for child with key
-                    ptr = i+1;
+                ptr = i+1;
             }
             if (i== curNode.size) ptr = curNode.size;
             curNode = (BTreeNode) curNode.pointers[ptr];
@@ -303,7 +298,7 @@ public class BTreeNode {
                 }
                 else if(curNode.keys[i] > max || curNode.keys[i] == -1){ //if max is reached
                     if(printNodes)
-                    System.out.println("Number of Nodes accessed: "+ count);
+                        System.out.println("Number of Nodes accessed: "+ count);
                     return result.stream().mapToInt(num->num).toArray();
                 }
             }
@@ -433,7 +428,7 @@ public class BTreeNode {
             }
 
         }
-     return this;
+        return this;
     }
 
     //after merged, call removeInternal to delete the pointer from parents
@@ -541,5 +536,6 @@ public class BTreeNode {
         return this;
     }
 }
+
 
 
