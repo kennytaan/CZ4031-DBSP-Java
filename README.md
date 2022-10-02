@@ -10,7 +10,7 @@ Option 1.
 or
 
 Option 2.
--Install Coding Pack for Java on https://code.visualstudio.com/docs/java/java-tutorial
+- Install Coding Pack for Java on https://code.visualstudio.com/docs/java/java-tutorial
 
 More information can be found here: https://code.visualstudio.com/docs/java/java-tutorial
 
