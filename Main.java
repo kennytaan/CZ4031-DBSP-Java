@@ -55,6 +55,7 @@ public class Main{
 		System.out.println("Average of average rating: " + calcAvgRatingFromSearch(diskfor200MB.searchForRecord(30000, 40000)) + "\n\n");
 
 		//Experiment 5
+//		diskfor200MB.getBPT().search(1000,1000,true);
 		System.out.println("Experiment 5: ");
 		diskfor200MB.getBPT().removeNode(1000);
 		System.out.println("Number of times that a node is deleted : " + diskfor200MB.getBPT().getNumOfDeleted());
@@ -65,6 +66,7 @@ public class Main{
 		System.out.println(((BTreeNode) diskfor200MB.getBPT().getPointers()[0]).getContent());
 		//diskfor200MB.getBPT().search(1000, 1000);
 
+//		diskfor200MB.getBPT().search(1000,1000,true);
 		boolean option = false;
 		while (!option){
 			Scanner question = new Scanner(System.in);  // Create a Scanner object
@@ -120,6 +122,7 @@ public class Main{
 				System.out.println(diskfor500MB.getBPT().getContent());
 				System.out.println(((BTreeNode) diskfor500MB.getBPT().getPointers()[0]).getContent());	
 				option = true;
+
 			} else{
 					if (choice.equals("2")){
 						System.out.println("Exiting!");
@@ -178,7 +181,7 @@ public class Main{
 				}
 
 				//store the record line as a temp record
-				Record tempRecord = new Record(tConst.toCharArray(), avgRating, numOfVotes);
+				Record tempRecord = new Record(tConst, avgRating, numOfVotes);
 				tempData.add(tempRecord); //storing the temp record to temp arraylist tempData
 				
 				

@@ -5,6 +5,7 @@ import java.io.IOException;
 //for ByteArrayOutputStream
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -46,9 +47,11 @@ public class DiskStorage {
     }
 
     public void insertRecord(Record record) throws IOException{
-        byte[] tConst_b = charArrToByteArray(record.getTConst());
+        byte[] tConst_b = charArrToByteArray(record.getTConst().toCharArray());
         byte[] avgRating_b = floatToByteArray(record.getAverageRating());
         byte[] numVotes_b = intToByteArray(record.getNumVotes());
+//        byte[] tConst_b = record.getTConst().getBytes("UTF-8");
+
         //concatenate byte array
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         byteOutputStream.write(tConst_b);
@@ -140,15 +143,18 @@ public class DiskStorage {
 
             //getting the tconst data in byte[] from the first 20bytes and convert to char[]
             byte[] tConstData = Arrays.copyOfRange(recordData, 0, 20);
-            char[] tConstActual = convertFromByteArrToCharArr(tConstData);
+            char[] tConstchar = convertFromByteArrToCharArr(tConstData);
+            String tConstActual = String.valueOf(tConstchar);
 
             //getting the rating in bytep[] from the next 4 bytes and convert to float
             byte[] avgRatingData = Arrays.copyOfRange(recordData, 20, 24);
             float avgRatingActual = convertFromByteArrToFloat(avgRatingData);
+//            float avgRatingActual = ByteBuffer.wrap(avgRatingData).order(ByteOrder.LITTLE_ENDIAN).getFloat();
 
             //getting the num votes in byte[] from the next 4 bytes and convert to int
             byte[] numVotesData = Arrays.copyOfRange(recordData, 24,28);
             int numVotesActual = convertFromByteArrToInt(numVotesData);
+//            int numVotesActual = ByteBuffer.wrap(numVotesData).getInt();
 
             //make a new record object w the datas retrieved
             Record recordToBeAdded = new Record(tConstActual,avgRatingActual,numVotesActual);
@@ -168,14 +174,14 @@ public class DiskStorage {
 
         final Object[][] table = new String[recordsResults.length][];
         for(int i=0;i<recordsResults.length;i++){
-            table[i]= new String[] { "Record"+i, String.valueOf(recordsResults[i].getTConst()), String.valueOf(recordsResults[i].getAverageRating()), String.valueOf(recordsResults[i].getNumVotes())  };
+            table[i]= new String[] { "Record "+i, recordsResults[i].getTConst(), String.valueOf(recordsResults[i].getAverageRating()), String.valueOf(recordsResults[i].getNumVotes())  };
         }
         for(int i =0;i<table.length;i++){
             if((i/RECORDSPERBLOCK) == 5) break;
             if (i%RECORDSPERBLOCK ==0){
                 System.out.println("data block "+(i/RECORDSPERBLOCK+1));
             }
-            System.out.format("%15s%15s%15s%n", table[i]);
+            System.out.format("%15s%15s%15s%15s%n", table[i]);
         }
 
         System.out.println("The number of data blocks accessed is " + noOfDataBlocksAccessed + "\n");
@@ -200,6 +206,7 @@ public class DiskStorage {
         int intBits = Float.floatToIntBits(value);
         return new byte[]{
                 (byte) (intBits >> 24), (byte) (intBits >> 16), (byte) (intBits >> 8), (byte) (intBits)};
+//        return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(value).array();
     }
 
     private static final byte[] intToByteArray(int value) {
@@ -208,6 +215,7 @@ public class DiskStorage {
                 (byte) (value >>> 16),
                 (byte) (value >>> 8),
                 (byte) value};
+//        return ByteBuffer.allocate(4).putInt(value).array();
     }
 
 
