@@ -3,6 +3,7 @@
 You may run the program on any supporting Java IDE (E.g. Microsoft Visual Studios, Eclipse, IntelliJ) which may require additional installations like JDKs. However, for this README, it is only a recommended installation guide by using Visual Studio Code.
 
 Ensure that you have done the following:
+
 Option 1.
 - Install Visual Studio Code on https://code.visualstudio.com/
 - Install Extension Pack on https://code.visualstudio.com/docs/java/java-tutorial
