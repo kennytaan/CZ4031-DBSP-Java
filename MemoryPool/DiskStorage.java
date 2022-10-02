@@ -92,9 +92,11 @@ public class DiskStorage {
     /* TO BE ADDED */
     public Record[] searchForRecord(int min, int max){
 
+       
+
         //return the addresses 
         int[] searchResults = bpt.search(min, max);
-        System.out.println(searchResults);
+        //System.out.println(searchResults);
         ArrayList<Record> recordsList = new ArrayList<>(); 
 
         //making hashmap to store the address 
@@ -102,6 +104,7 @@ public class DiskStorage {
         int noOfDataBlocksAccessed = 0;
 
         //looping through the searchresults
+        System.out.println("The content of data blocks accessed: ");
         for(int i=0;i<searchResults.length; i++){
             
             //get the address of the key
@@ -123,7 +126,9 @@ public class DiskStorage {
             //if successfully added to hashmap, get the hex data of the block byte[]
             boolean added = testHash.add(targetBlock);
             if (added){
-                //System.out.println(blocks[targetBlock].getHexData());
+                // if(noOfDataBlocksAccessed < 5){
+                //     System.out.println((noOfDataBlocksAccessed+1) + "the data block: " + blocks[targetBlock].getHexData());
+                // }
                 noOfDataBlocksAccessed+=1;
                 
             }
@@ -160,6 +165,19 @@ public class DiskStorage {
             recordsResults[i] = recordsList.get(i);
         }
         //System.out.println(recordsResults);
+
+        final Object[][] table = new String[recordsResults.length][];
+        for(int i=0;i<recordsResults.length;i++){
+            table[i]= new String[] { "Record"+i, String.valueOf(recordsResults[i].getTConst()), String.valueOf(recordsResults[i].getAverageRating()), String.valueOf(recordsResults[i].getNumVotes())  };
+        }
+        for(int i =0;i<table.length;i++){
+            if((i/RECORDSPERBLOCK) == 5) break;
+            if (i%RECORDSPERBLOCK ==0){
+                System.out.println("data block "+(i/RECORDSPERBLOCK+1));
+            }
+            System.out.format("%15s%15s%15s%n", table[i]);
+        }
+
         System.out.println("The number of data blocks accessed is " + noOfDataBlocksAccessed + "\n");
         return recordsResults;
 
@@ -228,8 +246,11 @@ public class DiskStorage {
         //Total size of the database = no of blocks x record size in a block
         int databaseSizeInBytes = (this.getNoOfBlocks() - 1) * recordSizeInABlock ;
 
+        /*TO BE ADDED HERE */ 
+        databaseSizeInBytes += this.getCurrentBlock().getOffset();
+
         //Convert database size (in bytes) to MB
-        double databaseSizeInMB =(double)(databaseSizeInBytes / (1024.0 * 1024.0));
+        double databaseSizeInMB =(double)(databaseSizeInBytes / (1000000));
 
         return databaseSizeInMB;
     }
