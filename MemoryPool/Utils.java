@@ -7,6 +7,16 @@ public class Utils {
 
 	public static void setBlockSize(){
 		BLOCKSIZE = 500;
+		RECORDSIZE = (10 * 2) + 4 + 4;1
+
+		DISKCAPACITY = 500 * 1000000;
+		RECORDSPERBLOCK = BLOCKSIZE/RECORDSIZE;
+		NO_OF_BLOCKS = DISKCAPACITY/BLOCKSIZE;
+		NO_OF_RECORDS = NO_OF_BLOCKS * RECORDSPERBLOCK;
+
+		NUMOFKEYS = ((BLOCKSIZE-8)/12);
+		NUMOFPOINTERS= NUMOFKEYS+1;
+		MINKEYS =  (NUMOFKEYS+1)/2;
 	}
 	//10char for tConst with 2bytes for each char, 4 bytes for float averageRating, 4 bytes for int
 	public static int RECORDSIZE = (10 * 2) + 4 + 4; 

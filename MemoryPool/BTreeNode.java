@@ -5,10 +5,10 @@ import java.util.Arrays;
 import static MemoryPool.Utils.*;
 
 public class BTreeNode {
-    public static final int MAX_KEYS = NUMOFKEYS;
-    private static final int MAX_POINTERS = NUMOFPOINTERS;
-    private static final int MIN_KEYS = MINKEYS;
-    private static final int MIN_NON_LEAF = NUMOFKEYS/2;
+    public static int MAX_KEYS = NUMOFKEYS;
+    private static int MAX_POINTERS = NUMOFPOINTERS;
+    private static int MIN_KEYS = MINKEYS;
+    private static int MIN_NON_LEAF = NUMOFKEYS/2;
     private static int root = 0;
     private static int numOfNodes = 0;
     private int[] keys = new int[NUMOFKEYS];
@@ -31,6 +31,15 @@ public class BTreeNode {
         return keysStr + ptrStr;
     }
 
+    public void brandNewTree(){
+        MAX_KEYS = NUMOFKEYS;
+        MAX_POINTERS = NUMOFPOINTERS;
+        MIN_KEYS = MINKEYS;
+        MIN_NON_LEAF = NUMOFKEYS/2;
+        root = 0;
+        numOfNodes = 0;
+        numOfDeleted = 0;
+    }
     public int[] getKeys() {
         return this.keys;
     }
@@ -69,7 +78,7 @@ public class BTreeNode {
         if (this.height == 0){
             //new tree
             if(this.keys[0] == -1){
-                this.root=0;
+                brandNewTree();
                 numOfNodes++;
             }
             return this.insertLeafNode(key, address);
