@@ -1,8 +1,5 @@
 package MemoryPool;
 
-
-//import java.lang.Math;
-
 public class Utils {
 
 	public static void setBlockSize(){

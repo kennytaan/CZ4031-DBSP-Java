@@ -1,5 +1,4 @@
 package MemoryPool;
-//import java.util.Arrays;
 
 
 //record consists of 3 variables: tConst, avgRating, numOfVotes

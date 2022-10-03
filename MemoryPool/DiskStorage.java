@@ -58,19 +58,11 @@ public class DiskStorage {
         byteOutputStream.write(avgRating_b);
         byteOutputStream.write(numVotes_b);
         byte[] record_b = byteOutputStream.toByteArray();
-        // TODO: add data into blocks
-        // TODO: determine the address of the record
-        /* A brief description of address:
-         * Assuming that all blocks are stored sequentially on the disk,
-         * in order to locate the first byte of a record,
-         * blockNumber = address / BLOCK_SIZE
-         * blockOffset = address % BLOCK_SIZE
-         * Then the following gives the value of the first byte of a record:
-         * this.blocks[blockNumber].getData()[blockOffset]
-         */
-
+        
         int offset;
 
+
+        //adding record into block
         if (blocks[currentBlock] == null) {
             blocks[currentBlock] = new Block();
         }
@@ -92,7 +84,7 @@ public class DiskStorage {
         
     }
 
-    /* TO BE ADDED */
+   
     public Record[] searchForRecord(int min, int max){
 
        
@@ -218,9 +210,6 @@ public class DiskStorage {
 //        return ByteBuffer.allocate(4).putInt(value).array();
     }
 
-
-
-    /*TO BE ADDED */
     //Functions to help convert from byte[] back to char[], int, float
     private static char[] convertFromByteArrToCharArr(byte[] bytes){
         Charset charset = Charset.forName("UTF-8");
@@ -254,7 +243,7 @@ public class DiskStorage {
         //Total size of the database = no of blocks x record size in a block
         int databaseSizeInBytes = (this.getNoOfBlocks() - 1) * BLOCKSIZE ;
 
-        /*TO BE ADDED HERE */
+        //adding the offset
         databaseSizeInBytes += this.getCurrentBlock().getOffset();
 
         //Convert database size (in bytes) to MB

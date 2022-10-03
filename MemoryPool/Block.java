@@ -1,7 +1,5 @@
 package MemoryPool;
 
-//import java.util.Arrays;
-
 import static MemoryPool.Utils.BLOCKSIZE;
 
 public class Block {
@@ -31,7 +29,6 @@ public class Block {
     }
 
 
-    /*TO BE ADDED */
     public String getHexData() {
         StringBuilder sb = new StringBuilder(data.length * 2);
         for(byte b: data)
@@ -39,11 +36,5 @@ public class Block {
         return "0x" + sb.toString();
     }
 
-    // public void addData(byte[] record){
-    //     //to do
-    // }
 
-    // public void deleteData(byte[] record){
-    //     //to do
-    // }
 }

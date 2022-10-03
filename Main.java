@@ -1,24 +1,12 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-//import java.util.List;
-//import java.util.StringTokenizer;
-//import java.util.ArrayList;
-//import java.io.IOException;
 
 import MemoryPool.BTreeNode;
-
-//import java.io.FileWriter;
-//import java.io.BufferedWriter;
-
-//import java.util.Arrays;
 
 import MemoryPool.DiskStorage;
 import MemoryPool.Record;
 import MemoryPool.Utils;
-
-//import static MemoryPool.Utils.RECORDSPERBLOCK;
-//import static MemoryPool.Utils.RECORDSIZE;
 
 public class Main{
 	public static void main(String[] args) throws FileNotFoundException, IOException{
@@ -57,14 +45,32 @@ public class Main{
 		//Experiment 5
 //		diskfor200MB.getBPT().search(1000,1000,true);
 		System.out.println("Experiment 5: ");
-		diskfor200MB.getBPT().removeNode(1000);
-		System.out.println("Number of times that a node is deleted : " + diskfor200MB.getBPT().getNumOfDeleted());
-		System.out.println("Number nodes of the updated B+ tree: " + diskfor200MB.getBPT().getNumOfNodes());
-		System.out.println("Height of the updated B+ tree: " + diskfor200MB.getBPT().getHeight());
+
+		BTreeNode deletionResult = diskfor200MB.getBPT();
+//		deletionResult.search(1000,1000);
+		deletionResult = deletionResult.removeNode(1000);
+
+//		for (int i=0;i<9;i++){//42
+//			deletionResult = deletionResult.remove(1000, new ArrayList<BTreeNode>(), new ArrayList<Integer>());
+//		}
+//
+//		deletionResult.search(999,1000);
+		System.out.println("Number of times that a node is deleted : " + deletionResult.getNumOfDeleted());
+		System.out.println("Number nodes of the updated B+ tree: " + deletionResult.getNumOfNodes());
+		System.out.println("Height of the updated B+ tree: " + deletionResult.getHeight());
 		System.out.println("content of the root node:");
-		System.out.println(diskfor200MB.getBPT().getContent());
-		System.out.println(((BTreeNode) diskfor200MB.getBPT().getPointers()[0]).getContent());
+		System.out.println(deletionResult.getContent());
+		System.out.println(((BTreeNode) deletionResult.getPointers()[0]).getContent());
 		//diskfor200MB.getBPT().search(1000, 1000);
+//		System.out.println("AAAAAAAAAAAAAAAAAAA");
+//		BTreeNode tree = new BTreeNode();
+//		for (int i=0;i<100;i++){
+//			if(i>40 && i<60)
+//			tree = tree.insertNode(10,100+i);
+//			else
+//				tree = tree.insertNode(i,100+i);
+//		}
+
 
 //		diskfor200MB.getBPT().search(1000,1000,true);
 		boolean option = false;
@@ -185,7 +191,7 @@ public class Main{
 				tempData.add(tempRecord); //storing the temp record to temp arraylist tempData
 				
 				
-				////////TODO: insert the records to the diskstorage////////
+				//insert the records to the diskstorage
 				d.insertRecord(tempRecord);
 
 			}
